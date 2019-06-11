@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhou.mapper.SiteMapper">
+    <resultMap id="BaseResultMap" type="com.zhou.model.Site">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="name" jdbcType="VARCHAR" property="name"/>
+        <result column="url" jdbcType="VARCHAR" property="url"/>
+        <result column="category_id" jdbcType="INTEGER" property="categoryId"/>
+        <result column="describe" jdbcType="VARCHAR" property="describe"/>
+        <result column="hits" jdbcType="INTEGER" property="hits"/>
+        <result column="cover" jdbcType="VARCHAR" property="cover"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, `name`, url, category_id,`describe`,hits,cover
+    </sql>
+
+    <!-- 查询总数量 -->
+    <select id="findAllCount" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM t_site
+    </select>
+
+    <select id="getAll" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM t_site
+    </select>
+
+    <select id="findById" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM t_site
+        WHERE id = #{id}
+    </select>
+
+    <insert id="insert" parameterType="com.zhou.model.Site">
+       INSERT INTO
+       		t_site
+        (`name`, url, category_id,`describe`,hits,cover)
+       	VALUES
+       		(#{name}, #{url}, #{categoryId},#{describe},#{hits},#{cover})
+    </insert>
+
+    <update id="update" parameterType="com.zhou.model.Site">
+        UPDATE
+        t_site
+        <set>
+            <if test="name != null">`name` = #{name},</if>
+            <if test="url != null">url = #{url},</if>
+            <if test="categoryId != null">category_id = #{categoryId},</if>
+            <if test="describe != null">`describe` = #{describe},</if>
+            <if test="hits != null">hits = #{hits},</if>
+            <if test="cover != null">cover = #{cover},</if>
+        </set>
+        WHERE
+        id = #{id}
+    </update>
+
+    <delete id="delete" parameterType="java.lang.Integer">
+       DELETE FROM
+       		 t_site
+       WHERE
+       		 id =#{id}
+    </delete>
+
+    <select id="select" parameterType="com.zhou.model.Site" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM t_site
+        <where>
+            <if test="url != null">
+                url LIKE CONCAT('%', #{url}, '%')
+            </if>
+        </where>
+        ORDER BY id DESC
+    </select>
+
+    <select id="findByCategoryId" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM t_site
+        WHERE category_id = #{categoryId}
+        ORDER BY hits DESC
+    </select>
+
+</mapper>

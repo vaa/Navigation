@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="admin/common/head"></head>
+<title>网站管理</title>
+<link rel="stylesheet" th:href="@{/admin/css/me.css}">
+<body>
+<!-- vue入口 -->
+<div id="app">
+    <div :class="'app-wrapper' + sidebarFlag">
+        <!-- aside -->
+        <div th:replace="admin/common/side"></div>
+
+        <!-- container -->
+        <el-container class="main-container">
+            <!-- header -->
+            <div style="background-color: rgb(84, 92, 100);" th:replace="admin/common/header"></div>
+
+            <!-- main -->
+            <el-main class="app-main">
+                <el-card>
+                    <h3>网站管理</h3>
+                    <el-row :gutter="20">
+                        <el-col :xs="12" :sm="12" :lg="6" :span="6" style="display: flex">
+                            <el-input placeholder="请输入url查询" size="small" v-model="searchEntity.url" @keyup.native="search(pageConf.pageCode, pageConf.pageSize)">
+                                <i slot="prefix" class="el-input__icon el-icon-search"></i>
+                            </el-input>
+                            <el-button @click="search(pageConf.pageCode, pageConf.pageSize)" plain size="small" style="margin-left:12px;" icon="el-icon-search"></el-button>
+                        </el-col>
+                        <el-col :xs="12" :sm="12" :lg="6" :span="6" style="float: right;text-align: right">
+                            <el-button size="small" plain type="primary" @click="handleSave" icon="el-icon-plus"></el-button>
+                            <el-button type="primary" plain size="small" @click="search(pageConf.pageCode, pageConf.pageSize)" icon="el-icon-refresh"></el-button>
+                        </el-col>
+                    </el-row>
+                    <br/>
+                    <!-- 列表 -->
+                    <el-table ref="site" :data="site" border tooltip-effect="dark" style="width: 100%">
+                        <el-table-column prop="id" align="center" sortable label="编号" show-overflow-tooltip width="80"></el-table-column>
+                        <el-table-column align="center" prop="name" label="名称" width="130" show-overflow-tooltip></el-table-column>
+                        <el-table-column align="center" label="网址" width="130">
+                            <template slot-scope="scope">
+                                <a :href="'http://' + scope.row.url" target="_blank" >{{scope.row.url}}</a>
+                            </template>
+                        </el-table-column>
+                        <el-table-column align="center" label="分类" width="130">
+                            <template slot-scope="scope">
+                                <el-tag type="success">{{scope.row.category}}</el-tag>
+                            </template>
+                        </el-table-column>
+                        <el-table-column align="center" label="点击次数" width="130">
+                            <template slot-scope="scope">
+                                <el-tag type="success">{{scope.row.hits}}</el-tag>
+                            </template>
+                        </el-table-column>
+                        <el-table-column align="center" prop="cover" label="网址图片" width="200">
+                            <template slot-scope="scope">
+                                <img :src="scope.row.cover" width="30" height="30"/>
+                            </template>
+                        </el-table-column>
+                        <el-table-column label="操作" align="center">
+                            <template slot-scope="scope">
+                                <el-button icon="el-icon-delete" size="mini" type="danger" @click="handleDelete(scope.row.id)">删除</el-button>
+                                <el-button style="margin-left:0;" size="mini" icon="el-icon-edit" type="warning" @click="handleEdit(scope.row.id)">编辑</el-button>
+                            </template>
+                        </el-table-column>
+                    </el-table>
+                    <br/>
+                    <!-- 分页 -->
+                    <div class="pagination">
+                        <el-pagination background @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="pageConf.pageCode"
+                                       :page-sizes="pageConf.pageOption"
+                                       :page-size="pageConf.pageSize"
+                                       layout="total, sizes, prev, pager, next, jumper"
+                                       :total="pageConf.totalPage">
+                        </el-pagination>
+                    </div>
+                </el-card>
+            </el-main>
+        </el-container>
+    </div>
+    <!-- 编辑 -->
+    <el-dialog
+            :title="dialogType? '新增网站信息':'编辑网站信息'"
+            :visible.sync="dialogVisible"
+            width="35%"
+            :append-to-body='true'
+            :before-close="handleClose">
+        <span>
+            <el-form :inline="true" :model="editor">
+                <el-form-item required prop="name" :rules="[{ required: true, message: '请输入名称'}]" label=" 名称 ">
+                    <el-input style="width: 300px" v-model="editor.name" placeholder="请输入名称"></el-input>
+                </el-form-item>
+                <el-form-item required prop="url" :rules="[{ required: true, message: '请输入网址'}]" label="网址">
+                    <el-input style="width: 300px" v-model="editor.url" placeholder="请输入网址">
+                         <template slot="prepend">Http://</template>
+                    </el-input>
+                </el-form-item>
+                <el-form-item required prop="categoryId" :rules="[{ required: true, message: '请选择文章分类'}]" label="分类">
+                    <el-select style="width: 300px" v-model="editor.categoryId" allow-create filterable placeholder="请选择文章分类">
+                        <el-option
+                                v-for="item in options"
+                                :key="item.value"
+                                :label="item.label"
+                                :value="item.value">
+                        </el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item required prop="hits" :rules="[{ required: true, message: '请输入点击次数'}]" label="点击">
+                    <el-input style="width: 300px" v-model="editor.hits" placeholder="请输入点击次数"></el-input>
+                </el-form-item>
+                <el-form-item required prop="cover" :rules="[{ required: true, message: '请输入图片链接'}]" label="图片">
+                    <el-input style="width: 300px" v-model="editor.cover" placeholder="请输入图片链接"></el-input>
+                </el-form-item>
+            </el-form>
+        </span>
+        <span slot="footer" class="dialog-footer">
+            <el-button @click="dialogVisible = false">取 消</el-button>
+            <el-button type="primary" @click="handleGo">确 定</el-button>
+        </span>
+    </el-dialog>
+</div>
+</body>
+<div th:replace="admin/common/js"></div>
+<script type="text/javascript" th:src="@{/admin/js/site.js}"></script>
+</html>

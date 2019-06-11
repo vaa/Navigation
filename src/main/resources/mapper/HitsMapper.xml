@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhou.mapper.HitsMapper">
+  <resultMap id="BaseResultMap" type="com.zhou.model.Hits">
+    <id column="user_id" jdbcType="INTEGER" property="userId" />
+    <id column="site_id" jdbcType="INTEGER" property="siteId" />
+    <result column="user_hits" jdbcType="INTEGER" property="userHits" />
+  </resultMap>
+
+  <sql id="Base_Column_List" >
+        user_id, site_id, user_hits
+    </sql>
+
+  <select id="getAll" resultMap="BaseResultMap"  parameterType="java.lang.Integer">
+    SELECT
+    <include refid="Base_Column_List" />
+    FROM t_hits
+    WHERE
+    user_id =#{userId}
+  </select>
+
+  <select id="findById" resultMap="BaseResultMap" >
+    SELECT
+    <include refid="Base_Column_List" />
+    FROM t_hits
+    WHERE
+    user_id =#{userId} AND site_id =#{siteId}
+  </select>
+
+  <insert id="insert" parameterType="com.zhou.model.Hits" >
+       INSERT INTO
+       		t_hits
+        (user_id, site_id, user_hits)
+       	VALUES
+       		(#{userId}, #{siteId}, #{userHits})
+    </insert>
+
+  <update id="update" parameterType="com.zhou.model.Hits">
+    UPDATE
+    t_hits
+    SET
+    user_hits = #{userHits}
+    WHERE
+    user_id =#{userId} AND site_id =#{siteId}
+  </update>
+
+  <delete id="delete"  >
+       DELETE FROM
+       		 t_hits
+       WHERE
+       <if test="userId != null"> site_id =#{siteId} AND </if>
+        user_id = #{userId}
+    </delete>
+</mapper>

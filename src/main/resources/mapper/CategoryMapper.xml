@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhou.mapper.CategoryMapper">
+    <resultMap id="BaseResultMap" type="com.zhou.model.Category">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="name" jdbcType="VARCHAR" property="name"/>
+        <result column="value" jdbcType="VARCHAR" property="value"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,name
+    </sql>
+
+    <!-- 查询总数量 -->
+    <select id="findAllCount" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM t_category
+    </select>
+
+    <select id="getAll" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM t_category
+    </select>
+
+    <select id="select" parameterType="com.zhou.model.Category" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM t_category
+    </select>
+
+    <insert id="insert" parameterType="com.zhou.model.Category">
+       INSERT INTO
+       		t_category
+        (name)
+       	VALUES
+       		(#{name})
+    </insert>
+
+    <delete id="delete" parameterType="java.lang.Integer">
+       DELETE FROM
+       		 t_category
+       WHERE
+       		 id =#{id}
+    </delete>
+
+    <!-- 更新 -->
+    <update id="update" parameterType="com.zhou.model.Category">
+        UPDATE t_category
+        <set>
+            <if test="name != null">
+                name = #{name}
+            </if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <!-- 根据ID查询 -->
+    <select id="findById" parameterType="java.lang.Integer" resultType="Category">
+        SELECT * FROM t_category WHERE id = #{id}
+    </select>
+
+    <select id="selectCategoryRanking" resultType="Category">
+        SELECT
+        t_category.id AS `id`,
+        t_category.name AS `name`,
+        SUM(hits) AS `value`
+        FROM
+        t_site,t_category
+        WHERE
+        t_site.category_id=t_category.id
+        GROUP BY
+        category_id
+        ORDER BY `value` DESC
+	</select>
+</mapper>

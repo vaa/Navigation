@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="admin/common/head"></head>
+<title>用户管理</title>
+<link rel="stylesheet" th:href="@{/admin/css/user.css}">
+<body>
+<!-- vue入口 -->
+<div id="app">
+    <div :class="'app-wrapper' + sidebarFlag">
+        <!-- aside -->
+        <div th:replace="admin/common/side"></div>
+
+        <!-- container -->
+        <el-container class="main-container">
+            <!-- header -->
+            <div style="background-color: rgb(84, 92, 100);" th:replace="admin/common/header"></div>
+
+            <!-- main -->
+            <el-main class="app-main">
+                <el-card>
+                    <h3>用户管理</h3>
+                    <el-row :gutter="20">
+                        <el-col :xs="12" :sm="12" :lg="6" :span="6" style="display: flex">
+                            <el-input placeholder="请输入用户名查询" size="small" v-model="searchEntity.username" @keyup.native="search(pageConf.pageCode, pageConf.pageSize)">
+                                <i slot="prefix" class="el-input__icon el-icon-search"></i>
+                            </el-input>
+                            <el-button @click="search(pageConf.pageCode, pageConf.pageSize)" plain size="small" style="margin-left:12px;" icon="el-icon-search"></el-button>
+                        </el-col>
+                        <el-col :xs="12" :sm="12" :lg="6" :span="6" style="float: right;text-align: right">
+                            <el-button size="small" plain type="primary" @click="handleAdd" icon="el-icon-plus"></el-button>
+                            <el-button type="primary" plain size="small" @click="search(pageConf.pageCode, pageConf.pageSize)" icon="el-icon-refresh"></el-button>
+                        </el-col>
+                    </el-row>
+                    <br/>
+                    <!-- 列表 -->
+                    <el-table ref="user" :data="user" border tooltip-effect="dark" style="width: 100%">
+                        <el-table-column prop="id" align="center" sortable label="编号" show-overflow-tooltip width="80"></el-table-column>
+                        <el-table-column align="center" prop="username" label="用户名" width="130" show-overflow-tooltip></el-table-column>
+                        <el-table-column align="center" prop="password" label="密码" width="130" show-overflow-tooltip></el-table-column>
+                        <el-table-column align="center" prop="nickName" label="昵称" width="130" show-overflow-tooltip></el-table-column>
+                        <el-table-column align="center" prop="registerDate" label="注册时间" width="200" show-overflow-tooltip></el-table-column>
+                        <el-table-column align="center" label="头像" width="170">
+                            <template slot-scope="scope">
+                                <img :src="scope.row.avatar" width="50" height="50">
+                            </template>
+                        </el-table-column>
+                        <el-table-column label="操作" align="center">
+                            <template slot-scope="scope">
+                                <el-button icon="el-icon-delete" size="mini" type="danger" @click="handleDelete(scope.row.id)">删除</el-button>
+                                <el-button style="margin-left:0;" size="mini" icon="el-icon-edit" type="warning" @click="handleEdit(scope.row.id)">编辑</el-button>
+                            </template>
+                        </el-table-column>
+                    </el-table>
+                    <br/>
+                    <!-- 分页 -->
+                    <div class="pagination">
+                        <el-pagination background @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="pageConf.pageCode"
+                                       :page-sizes="pageConf.pageOption"
+                                       :page-size="pageConf.pageSize"
+                                       layout="total, sizes, prev, pager, next, jumper"
+                                       :total="pageConf.totalPage">
+                        </el-pagination>
+                    </div>
+                </el-card>
+            </el-main>
+        </el-container>
+    </div>
+    <!-- 编辑 -->
+    <el-dialog
+            title="编辑用户信息"
+            :visible.sync="editDialog"
+            width="35%"
+            :append-to-body='true'
+            :before-close="handleClose">
+        <span>
+            <el-form :inline="true" :model="editor">
+                <el-form-item required prop="username" :rules="[{ required: true, message: '请输入用户名'}]" label=" 用户名称 ">
+                    <el-input style="width: 300px" v-model="editor.username" placeholder="请输入用户名"></el-input>
+                </el-form-item>
+                <el-form-item required prop="password" :rules="[{ required: true, message: '请输入密码'}]" label="用户密码">
+                    <el-input style="width: 300px" v-model="editor.password" placeholder="请输入密码"></el-input>
+                </el-form-item>
+                <el-form-item required prop="nickName" :rules="[{ required: true, message: '请输入昵称'}]" label="用户昵称">
+                    <el-input style="width: 300px" v-model="editor.nickName" placeholder="请输入昵称"></el-input>
+                </el-form-item>
+                <el-form-item required prop="registerDate" :rules="[{ required: true, message: '请输入注册时间'}]" label="注册时间">
+                    <el-date-picker type="datetime" v-model="editor.registerDate" placeholder="选择时间" value-format="yyyy-MM-dd HH:mm:ss" style="width: 300px"></el-date-picker>
+                </el-form-item>
+                <el-form-item required prop="avatar" :rules="[{ required: true, message: '请输入图片'}]" label="图片地址">
+                    <el-input style="width: 300px" v-model="editor.avatar" placeholder="请输入图片"></el-input>
+                </el-form-item>
+            </el-form>
+        </span>
+        <span slot="footer" class="dialog-footer">
+            <el-button @click="editDialog = false">取 消</el-button>
+            <el-button type="primary" @click="edit">确 定</el-button>
+        </span>
+    </el-dialog>
+</div>
+</body>
+<div th:replace="admin/common/js"></div>
+<script type="text/javascript" th:src="@{/admin/js/user.js}"></script>
+</html>

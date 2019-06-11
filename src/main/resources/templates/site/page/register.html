@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="site/common/head"></head>
+<title>系统登录</title>
+<link rel="stylesheet" th:href="@{/site/css/login.css}">
+<body>
+<div id="app">
+    <header id="header" class="header bg-white">
+        <div class="navbar-container">
+            <a href="/" class="navbar-logo">
+                网上导航
+            </a>
+        </div>
+    </header>
+    <el-container>
+        <el-main class="app-main">
+            <el-form label-width="0px" :model="register" ref="register" class="demo-ruleForm login-container">
+                <h3 class="title">用户注册</h3>
+                <el-form-item required prop="username" :rules="[{ required: true, message: '请输入账号'}]">
+                    <el-input type="text" v-model="register.username" placeholder="账号" auto-complete="off"></el-input>
+                </el-form-item>
+                <el-form-item required prop="password" :rules="[{ required: true, message: '请输入密码'}]">
+                    <el-input type="password" v-model="register.password" placeholder="密码" auto-complete="off"></el-input>
+                </el-form-item>
+                <el-form-item style="width:100%;">
+                    <el-button type="primary" style="width:100%;" @click="registerEnter('register')">注册
+                    </el-button>
+                </el-form-item>
+            </el-form>
+        </el-main>
+    </el-container>
+</div>
+</body>
+<div th:replace="site/common/js"></div>
+<script type="text/javascript" th:src="@{/site/js/register.js}"></script>
+</html>
